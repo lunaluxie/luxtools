@@ -99,3 +99,15 @@ if __name__=="__main__":
   ])
 
   print(add(["1"], 2))
+
+
+
+  add = overload([
+    lambda x: x,
+    lambda x,y: x+y,
+    lambda x,y,z: x+y+z
+  ])
+
+  print(add(1))
+  print(add(1,2))
+  print(add(1,2,3))
