@@ -45,20 +45,26 @@ def partial(f):
         sig = inspect.signature(f)
         total_parameters = len(sig.parameters)
 
-        if not hasattr(f, "_pargs"):
-            f._pargs = {}  # initialize empty if none
+        # Initialize stored args if not present
+        if not hasattr(f, "_stored_args"):
+            f._stored_args = []
+        if not hasattr(f, "_stored_kwargs"):
+            f._stored_kwargs = {}
 
-        bind = sig.bind_partial(*args, **{**f._pargs, **kwargs})
+        # Combine stored and new arguments
+        all_args = f._stored_args + list(args)
+        all_kwargs = {**f._stored_kwargs, **kwargs}
+
+        bind = sig.bind_partial(*all_args, **all_kwargs)
         bind.apply_defaults()
 
-        applied_arguments = len(bind.arguments)
-
-        do_currying = applied_arguments < total_parameters
+        do_currying = len(bind.arguments) < total_parameters
         if do_currying:
             fn = copy_func(f)
-            fn._pargs = bind.arguments.copy()
+            fn._stored_args = all_args
+            fn._stored_kwargs = all_kwargs
             return partial(fn)
 
-        return f(*bind.args, **bind.kwargs)
+        return f(*all_args, **all_kwargs)
 
     return wrapper
