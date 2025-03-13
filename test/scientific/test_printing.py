@@ -1,4 +1,4 @@
-from .printing import NumericResult
+from luxtools.scientific import NumericResult
 
 
 def test_numeric_result():

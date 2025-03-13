@@ -1,6 +1,23 @@
+import functools
 import inspect
+import types
+from copy import deepcopy
 from functools import wraps
 from typing import Callable, List
+
+
+def copy_func(f):
+    """Based on http://stackoverflow.com/a/6528148/190597 (Glenn Maynard)"""
+    g = types.FunctionType(
+        f.__code__,
+        f.__globals__,
+        name=f.__name__,
+        argdefs=f.__defaults__,
+        closure=f.__closure__,
+    )
+    g = functools.update_wrapper(g, f)
+    g.__kwdefaults__ = f.__kwdefaults__
+    return g
 
 
 def partial(f):
@@ -21,13 +38,17 @@ def partial(f):
     Returns:
         Callabe: The function itself with any arguments that were passed in curried.
     """
+    # f = copy_func(f)
 
     @wraps(f)
     def wrapper(*args, **kwargs):
+        fn = copy_func(f)
+
+        # Create a new function instance with its own state
         required_parameters = len(
             [
                 0
-                for _, param in f._pargs.items()
+                for _, param in fn._pargs.items()
                 if param.default == inspect.Parameter.empty
             ]
         )
@@ -40,20 +61,20 @@ def partial(f):
             try:
                 key = next(
                     k
-                    for k, v in f._pargs.items()
+                    for k, v in fn._pargs.items()
                     if v.default == inspect.Parameter.empty
                 )
-                f._pargs[key] = inspect.Parameter(
+                fn._pargs[key] = inspect.Parameter(
                     key, inspect.Parameter.KEYWORD_ONLY, default=arg
                 )
             except StopIteration:
                 # handle *args parameter
-                if hasattr(f, "_args"):
-                    f._args.extend(args[i:])
+                if hasattr(fn, "_args"):
+                    fn._args.extend(args[i:])
                     break
                 else:
                     raise TypeError(
-                        f"{f.__name__}() takes {required_parameters} positional arguments but {given_parameters} were given"
+                        f"{fn.__name__}() takes {required_parameters} positional arguments but {given_parameters} were given"
                     )
 
             remaining_params -= 1
@@ -61,20 +82,20 @@ def partial(f):
         # update keyword arguments
         for key, value in kwargs.items():
             # handle **kwargs parameter
-            if key not in f._pargs:
-                if hasattr(f, "_kwargs"):
-                    f._kwargs[key] = value
+            if key not in fn._pargs:
+                if hasattr(fn, "_kwargs"):
+                    fn._kwargs[key] = value
                 else:
                     raise TypeError(
-                        f"{f.__name__}() got an unexpected keyword argument '{key}'"
+                        f"{fn.__name__}() got an unexpected keyword argument '{key}'"
                     )
 
-            if f._pargs[key].default == inspect.Parameter.empty:
+            if fn._pargs[key].default == inspect.Parameter.empty:
                 # only update required args if we are adding new arguments instead of overriding existing ones.
                 remaining_params -= 1
 
             # handle keyword arguments that are already matched
-            f._pargs[key] = inspect.Parameter(
+            fn._pargs[key] = inspect.Parameter(
                 key, inspect.Parameter.KEYWORD_ONLY, default=value
             )
 
@@ -83,29 +104,32 @@ def partial(f):
 
         if do_currying:
             # do I even need c here, or can I just return partial(f)?
-            c = lambda *args, **kwargs: f(*args, **kwargs)
-            c._pargs = f._pargs
-            if hasattr(f, "_args"):
-                c._args = f._args
+            c = lambda *args, **kwargs: f(*args, **kwargs)  # noqa: E731
+            c._pargs = fn._pargs
+            if hasattr(fn, "_args"):
+                c._args = fn._args
             if hasattr(f, "_kwargs"):
-                c._kwargs = f._kwargs
+                c._kwargs = fn._kwargs
 
             # copy over attributes not handled by wraps
-            c.__doc__ = f.__doc__
-            c.__name__ = f.__name__
+            c.__doc__ = fn.__doc__
+            c.__name__ = fn.__name__
 
             return partial(c)
 
-        if not hasattr(f, "_args"):
-            f._args = []
-        if not hasattr(f, "_kwargs"):
-            f._kwargs = {}
+        if not hasattr(fn, "_args"):
+            fn._args = []
+        if not hasattr(fn, "_kwargs"):
+            fn._kwargs = {}
 
-        # TODO: find a way to apply args to the function.
-        return f(
-            **{**{key: value.default for key, value in f._pargs.items()}, **f._kwargs}
+        return fn(
+            **{
+                **{key: value.default for key, value in fn._pargs.items()},
+                **fn._kwargs,
+            }
         )
 
+    # smuggle my monkey patched variables
     if not hasattr(f, "_pargs"):
         sig = inspect.signature(f)
         f._pargs = sig.parameters.copy()
@@ -120,4 +144,4 @@ def partial(f):
             f._pargs.pop("kwargs")
             f._kwargs = {}
 
-    return wrapper
+    return copy_func(wrapper)
