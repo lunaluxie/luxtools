@@ -1,4 +1,4 @@
-from .compose import chain
+from luxtools.functional.compose import chain
 
 
 def test_basic_chain():

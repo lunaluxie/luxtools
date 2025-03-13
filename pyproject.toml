@@ -1,0 +1,22 @@
+[project]
+name = "luxtools"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "lux", email = "luna@lunalux.io" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "typeguard>=4.4.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "torch>=2.6.0",
+]
