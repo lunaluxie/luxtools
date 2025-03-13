@@ -7,6 +7,12 @@ A collection of functional programming utilities for Python.
 partial
 ```
 
+Okay so i think I understand the problem of multiple partial:
+- @partial return a function, and it's that function we edit to apply it. 
+- It should return the function we get to return the function that can the be partialled every time we try again. 
+    - maybe upon successful call 
+    - or maybe should give up and use functools.partial. 
+
 
 
 # Significant Figures
