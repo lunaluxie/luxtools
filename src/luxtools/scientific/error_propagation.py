@@ -1,5 +1,7 @@
-import torch
 from typing import Set
+
+import torch
+
 
 def get_leaf_nodes(tensor) -> Set[torch.Tensor]:
     """Traverses the computation graph of a tensor and returns the leaf nodes that require gradients.
@@ -45,7 +47,7 @@ def Variable(tensor: torch.Tensor, sigma: torch.Tensor) -> torch.Tensor:
     tensor.sigma = sigma
     return tensor
 
-def get_error(f: torch.Tensor) -> torch.Tensor:
+def get_error(f: torch.Tensor, zero_grad=True) -> torch.Tensor:
     """Computes the uncertainty of f.
 
     Example:
@@ -54,7 +56,7 @@ def get_error(f: torch.Tensor) -> torch.Tensor:
     ```
     x = torch.tensor([1.0, 3.0], dtype=torch.float32, requires_grad=True)
     x.sigma = torch.tensor([0.1,0.2], dtype=torch.float32)
-    y = torch.tensor([2.0, 4.0], dtype=torch.float32 requires_grad=True)
+    y = torch.tensor([2.0, 4.0], dtype=torch.float32, requires_grad=True)
     y.sigma = torch.tensor([0.2,0.3], dtype=torch.float32)
 
     f = x*y
@@ -75,6 +77,8 @@ def get_error(f: torch.Tensor) -> torch.Tensor:
 
     Args:
         f (torch.Tensor): The tensor for which the uncertainty is to be computed.
+        zero_grad (bool): Whether to zero the gradients after computing the uncertainty.
+                          Should probably be set to True, unless you need to inspect the gradients afterwards.
 
     Returns:
         torch.Tensor: The uncertainty of f.
@@ -86,7 +90,15 @@ def get_error(f: torch.Tensor) -> torch.Tensor:
     leaf_nodes = get_leaf_nodes(f)
 
     # calculate error
-    error = torch.Tensor(0)
+    error = torch.zeros_like(f)
     for leaf in leaf_nodes:
         error += (leaf.grad*leaf.sigma)**2
-    return torch.sqrt(error)
+
+    error = torch.sqrt(error)
+
+    # zero out leaf_nodes
+    if zero_grad:
+        for leaf in leaf_nodes:
+            leaf.grad.zero_()
+
+    return error
