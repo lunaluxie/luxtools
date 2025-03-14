@@ -88,7 +88,7 @@ name = "luxtools"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "typeguard" },
+    { name = "trycast" },
 ]
 
 [package.dev-dependencies]
@@ -101,7 +101,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "typeguard", specifier = ">=4.4.2" }]
+requires-dist = [{ name = "trycast", specifier = ">=1.2.0" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -297,15 +297,12 @@ wheels = [
 ]
 
 [[package]]
-name = "typeguard"
-version = "4.4.2"
+name = "trycast"
+version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/70/60/8cd6a3d78d00ceeb2193c02b7ed08f063d5341ccdfb24df88e61f383048e/typeguard-4.4.2.tar.gz", hash = "sha256:a6f1065813e32ef365bc3b3f503af8a96f9dd4e0033a02c28c4a4983de8c6c49", size = 75746 }
+sdist = { url = "https://files.pythonhosted.org/packages/8b/8b/8426d6d19848bd938bf3c66650f844605b5bb8bf2f82c0aece684c1d7d58/trycast-1.2.0.tar.gz", hash = "sha256:827a84f702d8a6e7b43bb7ba5e4cccd81b3fb7e59c9b2417e718407781e317a7", size = 24231 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/4b/9a77dc721aa0b7f74440a42e4ef6f9a4fae7324e17f64f88b96f4c25cc05/typeguard-4.4.2-py3-none-any.whl", hash = "sha256:77a78f11f09777aeae7fa08585f33b5f4ef0e7335af40005b0c422ed398ff48c", size = 35801 },
+    { url = "https://files.pythonhosted.org/packages/18/be/e9084ced1d36538bfb16c8bde6241a6696e53d5ecdd761065cfde0256dc6/trycast-1.2.0-py3-none-any.whl", hash = "sha256:5cece718b5a34378df8577f3b3aa515479611c9a37b4685d4d5aa4e6c1b4b20f", size = 18141 },
 ]
 
 [[package]]
