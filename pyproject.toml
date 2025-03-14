@@ -20,7 +20,12 @@ dev = [
     "numpy>=2.2.3",
     "pytest>=8.3.5",
     "pytest-cov>=6.0.0",
-    "pytorch-cpu>=2.6.0",
+    "torch>=2.6.0",
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu" },
 ]
 
 [[tool.uv.index]]
