@@ -2,7 +2,7 @@
 name = "luxtools"
 version = "0.1.0"
 description = "Add your description here"
-readme = "README.md"
+readme = "readme.md"
 authors = [
     { name = "lux", email = "luna@lunalux.io" }
 ]
