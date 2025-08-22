@@ -1,5 +1,24 @@
 from decimal import Decimal
 
+
+def to_latex(x: float, precision=1) -> str:
+    """Convert a float to a latex string.
+
+    Args:
+        x (float): Float to convert
+        precision (int, optional): Precision of the float. Defaults to 1.
+
+    TODO: fix \\ issue in printing latex string
+    TODO: fix 00, and +1, and -01 issue in printing
+
+    Returns:
+        str: Latex string
+    """
+    ltx = lambda s: f"{s.split('E')[0]}" + "\\cdot 10^{" + s.split("E")[1] + "}"
+    fmt = lambda x: f"{x:0.{precision}E}"
+    return ltx(fmt(x))
+
+
 class NumericResult():
     def __init__(self, value:float, uncertainty:float=0, unit:str=""):
         """Initialize NumericResult with value, uncertainty and unit.
