@@ -1,4 +1,4 @@
-from luxtools import overload
+from luxtools.functional import overload
 
 
 def test_class_types():

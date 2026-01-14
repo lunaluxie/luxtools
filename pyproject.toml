@@ -8,6 +8,8 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "beartype>=0.22.9",
+    "more-itertools>=10.8.0",
     "trycast>=1.2.0",
 ]
 
